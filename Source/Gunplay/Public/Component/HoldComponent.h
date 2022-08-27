@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HoldComponent.generated.h"
 
-DECLARE_EVENT(UHoldingComponent, FHoldingEvent)
+DECLARE_EVENT(UHoldComponent, FHoldingEvent)
 
 /*
  * 能够让Character具有以下功能
