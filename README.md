@@ -1,10 +1,6 @@
 # Gunplay
 
-<<<<<<< HEAD
 > 使用UE4.27开发 
-=======
-> 使用UE4.27开发 \
->>>>>>> 5a82f9e6a7647c355d223f9b8abdafe06ff475dc
 >
 > 代码总行数为10608
 >
@@ -86,18 +82,11 @@
    7. 获取随机武器
 
 物品与角色的类图
-<<<<<<< HEAD
 ![](Img/UML1.png)
 
 角色之间的类图
 ![](Img/UML2.png)
 
-=======
-![](Intermediate/ProjectFiles/Img/UML1.png)
-
-角色之间的类图
-![](Intermediate/ProjectFiles/Img/UML2.png)
->>>>>>> 5a82f9e6a7647c355d223f9b8abdafe06ff475dc
 ## 技术细节
 ### 安卓端旋转操作优化
 
