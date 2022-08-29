@@ -175,7 +175,6 @@ void UHoldComponent::RemoveHolding(AActor* Holding)
 		SetCurrentHoldingIndex(CurrentHoldingIndex);
 	}
 	OnRep_CurrentHoldingIndex();
-	CurrentIndexId++;
 }
 
 AActor* UHoldComponent::GetCurrentHolding() const

@@ -16,16 +16,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerName(const FString& Name);
 
-	UFUNCTION(BlueprintCallable, Category="State")
-	void SetScore(const int32 NewValue);
-
-	UFUNCTION(BlueprintCallable, Category="State")
-	void AddScore(const int32 Delta);
-
-	FORCEINLINE int32 GetPlayerScore() const
-	{
-		return static_cast<int32>(APlayerState::GetScore());
-	}
+	FORCEINLINE int32 GetPlayerScore() const { return static_cast<int32>(APlayerState::GetScore()); }
 
 	FORCEINLINE int32 GetRank() const { return Rank; }
 
@@ -40,6 +31,7 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_Rank();
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

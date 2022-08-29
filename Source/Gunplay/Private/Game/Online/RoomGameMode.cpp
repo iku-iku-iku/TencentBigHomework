@@ -28,6 +28,21 @@ void ARoomGameMode::RefreshPlayerInfo()
 void ARoomGameMode::StartGame()
 {
 	bStartGame = true;
+
+	UGunplayGameInstance::GetInstance()->SetPlayerNum(PlayerCount);
+}
+
+void ARoomGameMode::SetMapItemIndex(const int32 NewValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("GameMode Set %d"), NewValue)
+	MapItemIndex = NewValue;
+
+	for (ARoomPlayerController* RoomPlayerController : GetRoomPlayerControllers())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Setting %d"), NewValue)
+
+		RoomPlayerController->SetMapItemIndex(NewValue);
+	}
 }
 
 void ARoomGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
@@ -58,6 +73,8 @@ void ARoomGameMode::PostLogin(APlayerController* NewPlayer)
 			RoomPlayerController->SetIsHost(true);
 		}
 
+		RoomPlayerController->SetMapItemIndex(GetMapItemIndex());
+		
 		// 等待bIsHost同步
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [RoomPlayerController, this, &TimerHandle]

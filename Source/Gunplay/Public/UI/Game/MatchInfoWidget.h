@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchInfoWidget.generated.h"
 
-
+/*
+ * 展示对局信息
+ */
 UCLASS()
 class GUNPLAY_API UMatchInfoWidget : public UUserWidget
 {
@@ -19,7 +21,7 @@ protected:
 	class UVerticalBox* RankPreview;
 
 	UPROPERTY(EditDefaultsOnly, Category="Match")
-	TSubclassOf<class URankListItemWidget> RankListItemClass;
+	TSubclassOf<class UPlayerInfoListItemWidget> PreviewPlayerInfoListItemClass;
 
 	UPROPERTY(VisibleAnywhere, Category="Match")
 	int32 RankPreviewCount = 3;

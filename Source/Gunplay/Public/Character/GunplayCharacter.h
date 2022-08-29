@@ -118,6 +118,8 @@ private:
 
 	void CalculateFootIK(const float DeltaSeconds);
 
+	uint8 bDead : 1;
+
 protected:
 	// 只在射击者的客户端进行的射击效果显示
 	UFUNCTION(Client, Reliable)

@@ -100,6 +100,15 @@ public:
 	UFUNCTION(BlueprintPure, Category="Game")
 	UObject* GetSingleton(const UClass* Class) const;
 
+	FORCEINLINE void SetPlayerNum(const int32 NewValue) { PlayerNum = NewValue; }
+
+	FORCEINLINE int32 ConsumePlayerNum()
+	{
+		const int32 Tmp = PlayerNum;
+		PlayerNum = 0;
+		return Tmp;
+	}
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Online")
 	FText PlayerName{};
@@ -182,6 +191,9 @@ private:
 
 	UPROPERTY()
 	TMap<FUniqueNetIdRepl, FVector> PlayerCharacterColorMap;
+
+	// 要进行游戏的玩家数
+	int32 PlayerNum;
 };
 
 void UGunplayGameInstance::AddSingleton(UObject* Singleton)

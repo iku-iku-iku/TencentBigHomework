@@ -3,21 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "Game/Online/PlayerInfo.h"
+#include "UI/SingletonWidget.h"
 #include "RoomWidget.generated.h"
 
-class UPlayerListItemWidget;
+class URoomPlayerListItemWidget;
 /**
  * 
  */
 UCLASS()
-class GUNPLAY_API URoomWidget : public UUserWidget
+class GUNPLAY_API URoomWidget : public USingletonWidget
 {
 	GENERATED_BODY()
 
 public:
 	void UpdatePlayerList(const TArray<FPlayerInfo>& PlayerInfos);
+
+	void SetMapItemIndex(const int32 Index);
 protected:
 	UPROPERTY(meta=(BindWidget))
 	class UVerticalBox* PlayerList;
@@ -63,18 +65,15 @@ protected:
 	void SwitchMapRight();
 
 	UPROPERTY(EditDefaultsOnly, Category="Room")
-	TSubclassOf<UPlayerListItemWidget> PlayerListItemWidgetClass;
+	TSubclassOf<URoomPlayerListItemWidget> PlayerListItemWidgetClass;
 
 	// 地图数据。在蓝图中设定
 	UPROPERTY(EditDefaultsOnly, Category="Room")
 	class UDataTable* MapTable;
 
 private:
-	int32 MapItemIndex = 0;
 
 	TArray<FName> MapTableRowNames;
-
-	void SetMapItem(int32 Index);
 
 	void SetUIVisibility() const;
 };

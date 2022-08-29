@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerInfoListItemWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Game/Online/OnlinePlayerState.h"
+#include "UI/Game/PlayerInfoListWidget.h"
 #include "RankListItemWidget.generated.h"
 
 
@@ -12,11 +14,10 @@
  * 排名Item
  */
 UCLASS()
-class GUNPLAY_API URankListItemWidget : public UUserWidget
+class GUNPLAY_API URankListItemWidget : public UPlayerInfoListItemWidget
 {
 	GENERATED_BODY()
-public:
-	FORCEINLINE void Inject(class AOnlinePlayerState* InjectState) { PlayerState = InjectState; }
+
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -30,9 +31,6 @@ protected:
 	class UTextBlock* Name;
 
 private:
-	UPROPERTY()
-	class AOnlinePlayerState* PlayerState;
-
 	UFUNCTION()
 	FText GetScore();
 

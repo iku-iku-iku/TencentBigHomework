@@ -24,9 +24,11 @@ public:
 	void Montage_StartProject(const class AGunplayCharacter* Projector) const;
 	void Montage_EndProject(const class AGunplayCharacter* Projector) const;
 
+	FORCEINLINE void SetProjectForce(const float NewValue) { ProjectForce = NewValue; }
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile")
-	float BaseProjectForce = 5000.f;
+	float ProjectForce = 5000.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile")
 	float ProjectHeightScale = 0.5f;

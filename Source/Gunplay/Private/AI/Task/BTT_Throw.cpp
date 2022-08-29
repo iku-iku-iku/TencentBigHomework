@@ -1,14 +1,13 @@
 // Copyright iku-iku-iku,. All Rights Reserved.
 
 #include "AI/Task/BTT_Throw.h"
-#include "Engine/World.h"
-
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Character/Enemy/EnemyCharacter.h"
 #include "Component/HoldComponent.h"
-#include "Interface/BeObtainedInterface.h"
+#include "Component/ProjectileComponent.h"
 #include "Interface/UseInterface.h"
+#include "Util/GunplayUtils.h"
 
 UBTT_Throw::UBTT_Throw()
 {
@@ -28,19 +27,13 @@ EBTNodeResult::Type UBTT_Throw::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 				if (const AActor* Target = Cast<AActor>(
 					BlackboardComponent->GetValueAsObject(GetSelectedBlackboardKey())))
 				{
-					CreateThrowHolding(EnemyCharacter);
-
-					if (UHoldComponent* HoldingComponent = EnemyCharacter->GetHoldingComponent())
+					if (const UHoldComponent* HoldingComponent = EnemyCharacter->GetHoldingComponent())
 					{
 						if (AActor* CurrentHolding = HoldingComponent->GetCurrentHolding())
 						{
-							if (CurrentHolding->GetClass() == ThrowHoldingClass)
+							if (ThrowAt(Target, CurrentHolding, EnemyCharacter))
 							{
-								if (ThrowAt(Target, CurrentHolding, EnemyCharacter))
-								{
-
-									NodeResult = EBTNodeResult::Succeeded;
-								}
+								NodeResult = EBTNodeResult::Succeeded;
 							}
 						}
 					}
@@ -48,6 +41,7 @@ EBTNodeResult::Type UBTT_Throw::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 			}
 		}
 	}
+
 	return NodeResult;
 }
 
@@ -56,35 +50,28 @@ void UBTT_Throw::OnGameplayTaskActivated(UGameplayTask& Task)
 	Super::OnGameplayTaskActivated(Task);
 }
 
-void UBTT_Throw::CreateThrowHolding(AGunplayCharacter* Receiver) const
+bool UBTT_Throw::ThrowAt(const AActor* Target, AActor* Projectile, AEnemyCharacter* AICharacter) const
 {
-	Receiver->ObtainHolding(ThrowHoldingClass);
-}
+	check(AICharacter != nullptr && Target != nullptr && Projectile != nullptr)
 
-bool UBTT_Throw::ThrowAt(const AActor* Target, AActor* ThrowThing, AEnemyCharacter* EnemyCharacter)
-{
-	check(EnemyCharacter != nullptr && Target != nullptr && ThrowThing != nullptr)
-
-	if (IUseInterface* UseInterface = Cast<IUseInterface>(ThrowThing))
+	if (IUseInterface* UseInterface = Cast<IUseInterface>(Projectile))
 	{
 		const FVector TargetLocation = Target->GetActorLocation();
-		const FVector CurrentLocation = EnemyCharacter->GetActorLocation();
+		const FVector CurrentLocation = AICharacter->GetActorLocation();
 		const float Distance = FVector::Distance(TargetLocation, CurrentLocation);
-		FVector LookAtLocation = (TargetLocation + CurrentLocation) / 2;
-		LookAtLocation.Z = Distance * LookHeightScale;
 
-		EnemyCharacter->LookAt(LookAtLocation);
+		AICharacter->LookAt(TargetLocation);
 
-		EnemyCharacter->Jump();
+		if (UProjectileComponent* ProjectileComponent = GunplayUtils::GetComponent<UProjectileComponent>(Projectile))
+		{
+			// 距离越远，抛掷力度越大
+			ProjectileComponent->SetProjectForce(Distance * ThrowForceScale);
+		}
+
+		AICharacter->Jump();
 		UseInterface->Use();
 		UseInterface->Used();
 
-
-		if (UMeshComponent* MeshComponent = Cast<UMeshComponent>(
-			ThrowThing->GetComponentByClass(UMeshComponent::StaticClass())))
-		{
-			UE_LOG(LogAI, Warning, TEXT("Current Velocity %s"), *MeshComponent->GetPhysicsLinearVelocity().ToString());
-		}
 		return true;
 	}
 	return false;

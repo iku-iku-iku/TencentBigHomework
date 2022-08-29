@@ -33,13 +33,20 @@ void AGunplayPlayerController::SetPawn(APawn* InPawn)
 		check(ControlledPlayerCharacter)
 
 		ControlledPlayerCharacter->SetOwner(this);
+
 		ControlledPlayerCharacter->OnDeath().AddLambda([this](const AGunplayCharacter* GunplayCharacter)
-		{
-			if (const APlayerCharacter* DeadPlayerCharacter = Cast<APlayerCharacter>(GunplayCharacter))
 			{
-				OnPlayerDeath(DeadPlayerCharacter);
+				if (const APlayerCharacter* DeadPlayerCharacter = Cast<APlayerCharacter>(GunplayCharacter))
+				{
+					check(HasAuthority())
+					if (! bDead)
+					{
+						bDead = true;
+						OnPlayerDeath(DeadPlayerCharacter);
+					}
+				}
 			}
-		});
+		);
 	}
 }
 

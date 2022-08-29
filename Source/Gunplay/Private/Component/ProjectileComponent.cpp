@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Character/GunplayCharacter.h"
 #include "Character/Enemy/EnemyCharacter.h"
+#include "Component/PickupComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Util/GunplayUtils.h"
 
@@ -47,7 +48,11 @@ void UProjectileComponent::Project(const AGunplayCharacter* Projector)
 	Owner->SetActorLocation(Owner->GetActorLocation() + ProjectDirection * ProjectStartOffset);
 	if (UMeshComponent* Mesh = GunplayUtils::GetComponent<UMeshComponent>(Owner))
 	{
-		Mesh->AddImpulse(ProjectDirection * BaseProjectForce);
+		if (UPickupComponent* PickupComponent = GunplayUtils::GetComponent<UPickupComponent>(GetOwner()))
+		{
+			PickupComponent->SetSimulatePhysics(true);
+		}
+		Mesh->AddImpulse(ProjectDirection * ProjectForce);
 	}
 }
 

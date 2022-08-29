@@ -112,7 +112,4 @@ private:
 	bool bUsingHolding = false;
 
 	FHoldingEvent SwitchHoldingEvent;
-
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentHoldingIndex)
-	int32 CurrentIndexId;
 };

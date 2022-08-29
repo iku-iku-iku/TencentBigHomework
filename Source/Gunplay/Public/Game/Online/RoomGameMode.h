@@ -7,7 +7,8 @@
 #include "RoomGameMode.generated.h"
 
 /**
- * 
+ * 房间模式：最先进入的玩家为房主，房主可以选择游戏模式
+ * 当所有玩家准备好后，房主可以开始游戏
  */
 UCLASS()
 class GUNPLAY_API ARoomGameMode : public AGameModeBase
@@ -18,7 +19,7 @@ public:
 	UFUNCTION()
 	void RefreshPlayerInfo();
 
-	FORCEINLINE TArray<class ARoomPlayerController*>& GetOnlinePlayerControllers()
+	FORCEINLINE TArray<class ARoomPlayerController*>& GetRoomPlayerControllers()
 	{
 		return ConnectedPlayerControllers;
 	}
@@ -26,9 +27,15 @@ public:
 	FORCEINLINE TArray<struct FPlayerInfo>& GetConnectedPlayerInfos() { return ConnectedPlayerInfos; }
 
 	void StartGame();
-protected:
-	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+
+	void SetMapItemIndex(const int32 NewValue);
 	
+	FORCEINLINE int32 GetMapItemIndex() const { return MapItemIndex; }
+
+protected:
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	                      FString& ErrorMessage) override;
+
 	virtual void PostLogin(class APlayerController* NewPlayer) override;
 
 	virtual void Logout(AController* Exiting) override;
@@ -42,4 +49,6 @@ private:
 	int32 PlayerCount;
 
 	bool bStartGame;
+
+	int32 MapItemIndex = 0;
 };

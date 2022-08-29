@@ -12,6 +12,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Game/GunplayPlayerController.h"
 #include "Game/Online/OnlinePlayerState.h"
+#include "Game/Online/ScoreMode/ScorePlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Holding/Gun.h"
 #include "Holding/Hands.h"
@@ -170,7 +171,7 @@ void APlayerCharacter::BeKilledBy(const AController* Killer)
 	{
 		if (const APlayerController* KillerPlayer = Cast<APlayerController>(Killer))
 		{
-			if (AOnlinePlayerState* OnlinePlayerState = KillerPlayer->GetPlayerState<AOnlinePlayerState>())
+			if (AScorePlayerState* OnlinePlayerState = KillerPlayer->GetPlayerState<AScorePlayerState>())
 			{
 				OnlinePlayerState->AddScore(100);
 			}

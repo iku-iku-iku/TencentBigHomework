@@ -41,7 +41,9 @@ protected:
 	UPROPERTY()
 	class APlayerCharacter* ControlledPlayerCharacter;
 
+	bool bDead;
 private:
 	float TurnSensitivity = 0.f;
 	float LookUpSensitivity = 0.f;
+
 };

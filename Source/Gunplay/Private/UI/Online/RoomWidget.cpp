@@ -14,7 +14,7 @@
 #include "Game/GunplayGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Game/Online/RoomPlayerController.h"
-#include "UI/Item/PlayerListItemWidget.h"
+#include "UI/Item/RoomPlayerListItemWidget.h"
 #include "Game/Online/MapItemStruct.h"
 #include "Util/GunplayUtils.h"
 
@@ -30,6 +30,8 @@ void URoomWidget::NativeOnInitialized()
 	StartGameBtn->OnClicked.AddDynamic(this, &URoomWidget::StartGame);
 	PrepareBtn->OnClicked.AddDynamic(this, &URoomWidget::Prepare);
 	ResetColorBtn->OnClicked.AddDynamic(this, &URoomWidget::ResetCharacterColor);
+	RightSwitchMapBtn->OnClicked.AddDynamic(this, &URoomWidget::SwitchMapRight);
+	LeftSwitchMapBtn->OnClicked.AddDynamic(this, &URoomWidget::SwitchMapLeft);
 
 	ResetCharacterColor();
 }
@@ -41,7 +43,7 @@ void URoomWidget::UpdatePlayerList(const TArray<FPlayerInfo>& PlayerInfos)
 		PlayerList->ClearChildren();
 		for (const FPlayerInfo& Info : PlayerInfos)
 		{
-			if (UPlayerListItemWidget* PlayerListItemWidget = CreateWidget<UPlayerListItemWidget>(
+			if (URoomPlayerListItemWidget* PlayerListItemWidget = CreateWidget<URoomPlayerListItemWidget>(
 				this, PlayerListItemWidgetClass))
 			{
 				PlayerListItemWidget->InjectPlayerInfo(Info);
@@ -64,6 +66,7 @@ void URoomWidget::StartGame()
 {
 	if (ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(GetOwningPlayer()))
 	{
+		const int32 MapItemIndex = RoomPlayerController->GetMapItemIndex();
 		const FMapItemStruct* MapItemStruct = MapTable->FindRow<FMapItemStruct>(MapTableRowNames[MapItemIndex], "");
 		RoomPlayerController->Server_StartGame(*MapItemStruct->Map);
 	}
@@ -73,11 +76,12 @@ void URoomWidget::ResetCharacterColor()
 {
 	const FVector RandColor = GunplayUtils::FRandVector();
 
-	if (ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(UGameplayStatics::GetPlayerController(this, 0)))
+	if (ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(
+		UGameplayStatics::GetPlayerController(this, 0)))
 	{
 		RoomPlayerController->Server_SetPlayerCharacterColor(RandColor);
 	}
-	
+
 	if (const ASkeletalMeshActor* SkeletalMeshActor = GunplayUtils::GetActorOfClass<ASkeletalMeshActor>(this))
 	{
 		if (USkeletalMeshComponent* SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent())
@@ -89,36 +93,48 @@ void URoomWidget::ResetCharacterColor()
 
 void URoomWidget::SwitchMapLeft()
 {
-	if (MapItemIndex > 0)
+	if (ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(
+		UGameplayStatics::GetPlayerController(this, 0)))
 	{
-		MapItemIndex--;
-		SetMapItem(MapItemIndex);
+		const int32 MapItemIndex = RoomPlayerController->GetMapItemIndex();
+
+		if (MapItemIndex > 0)
+		{
+			RoomPlayerController->Server_SetMapItemIndex(MapItemIndex - 1);
+		}
 	}
 }
 
 void URoomWidget::SwitchMapRight()
 {
-	if (MapItemIndex < MapTableRowNames.Num() - 1)
+	if (ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(
+		UGameplayStatics::GetPlayerController(this, 0)))
 	{
-		MapItemIndex++;
-		SetMapItem(MapItemIndex);
+		const int32 MapItemIndex = RoomPlayerController->GetMapItemIndex();
+
+		if (MapItemIndex < MapTableRowNames.Num() - 1)
+		{
+			RoomPlayerController->Server_SetMapItemIndex(MapItemIndex + 1);
+		}
 	}
 }
-
 
 void URoomWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	MapItemIndex = 0;
-	SetMapItem(0);
+	if (const ARoomPlayerController* RoomPlayerController = Cast<ARoomPlayerController>(
+		UGameplayStatics::GetPlayerController(this, 0)))
+	{
+		SetMapItemIndex(RoomPlayerController->GetMapItemIndex());
+	}
 
 	SetUIVisibility();
 }
 
-void URoomWidget::SetMapItem(int32 Index)
+void URoomWidget::SetMapItemIndex(const int32 Index)
 {
-	if (MapTable && Index >= 0 && Index < MapTableRowNames.Num())
+	if (MapTable && MapTableRowNames.IsValidIndex(Index))
 	{
 		const FMapItemStruct* Item = MapTable->FindRow<FMapItemStruct>(MapTableRowNames[Index], "");
 		if (MapNameText)

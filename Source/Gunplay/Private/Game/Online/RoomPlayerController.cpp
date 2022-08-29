@@ -75,7 +75,7 @@ void ARoomPlayerController::Server_StartGame_Implementation(const FString& MapNa
 	if (ARoomGameMode* RoomGameMode = Cast<ARoomGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
 		RoomGameMode->StartGame();
-		for (ARoomPlayerController* OnlinePlayerController : RoomGameMode->GetOnlinePlayerControllers())
+		for (ARoomPlayerController* OnlinePlayerController : RoomGameMode->GetRoomPlayerControllers())
 		{
 			OnlinePlayerController->Client_StartingGame();
 		}
@@ -88,18 +88,33 @@ void ARoomPlayerController::Server_SetPlayerCharacterColor_Implementation(const 
 	UGunplayGameInstance::GetInstance()->SetPlayerCharacterColor(UniqueNetId, Color);
 }
 
+void ARoomPlayerController::Server_SetMapItemIndex_Implementation(const int32 NewValue)
+{
+	if (ARoomGameMode* RoomGameMode = Cast<ARoomGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		RoomGameMode->SetMapItemIndex(NewValue);
+	}
+}
+
+void ARoomPlayerController::SetMapItemIndex(const int32 NewValue)
+{
+	MapItemIndex = NewValue;
+	OnRep_MapItemIndex();
+}
+
 void ARoomPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ARoomPlayerController, bIsHost)
+	DOREPLIFETIME(ARoomPlayerController, MapItemIndex)
 }
 
 void ARoomPlayerController::Server_DestroySessions_Implementation()
 {
 	if (ARoomGameMode* RoomGameMode = Cast<ARoomGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
-		for (const ARoomPlayerController* OnlinePlayerController : RoomGameMode->GetOnlinePlayerControllers())
+		for (const ARoomPlayerController* OnlinePlayerController : RoomGameMode->GetRoomPlayerControllers())
 		{
 			if (UGunplayGameInstance* OnlineGameInstance = Cast<
 				UGunplayGameInstance>(UGameplayStatics::GetGameInstance(OnlinePlayerController)))
@@ -124,4 +139,12 @@ bool ARoomPlayerController::CanStartGame() const
 		}
 	}
 	return bCanStartGame;
+}
+
+void ARoomPlayerController::OnRep_MapItemIndex()
+{
+	if (RoomWidget)
+	{
+		RoomWidget->SetMapItemIndex(MapItemIndex);
+	}
 }

@@ -21,13 +21,8 @@ class GUNPLAY_API UBTT_Throw : public UBTTask_BlackboardBase
 
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
-	UPROPERTY(EditAnywhere, Category="Throw")
-	TSubclassOf<class AActor> ThrowHoldingClass;
-
-	void CreateThrowHolding(AGunplayCharacter* Receiver) const;
-
-	bool ThrowAt(const AActor* Target, AActor* ThrowThing, class AEnemyCharacter* EnemyCharacter);
+	bool ThrowAt(const AActor* Target, AActor* Projectile, class AEnemyCharacter* AICharacter) const;
 
 	UPROPERTY(EditAnywhere, Category="Throw")
-	float LookHeightScale= 0.5f;
+	float ThrowForceScale = 1.f;
 };

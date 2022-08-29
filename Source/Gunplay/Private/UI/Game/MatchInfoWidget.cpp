@@ -8,7 +8,7 @@
 #include "Components/VerticalBox.h"
 #include "Game/GunplayGameInstance.h"
 #include "GameFramework/PlayerState.h"
-#include "Game/Online/OnlineGunplayGameState.h"
+#include "Game/Online/OnlineGameState.h"
 #include "UI/Item/RankListItemWidget.h"
 
 
@@ -16,7 +16,7 @@ void UMatchInfoWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	if (AOnlineGunplayGameState* OnlineGunplayGameState = Cast<AOnlineGunplayGameState>(
+	if (AOnlineGameState* OnlineGunplayGameState = Cast<AOnlineGameState>(
 		UGameplayStatics::GetGameState(GetWorld())))
 	{
 		OnlineGunplayGameState->OnRankReorder().AddLambda([this]
@@ -32,7 +32,7 @@ void UMatchInfoWidget::UpdateRankItems()
 	{
 		RankPreview->ClearChildren();
 
-		if (const AOnlineGunplayGameState* OnlineGunplayGameState = Cast<AOnlineGunplayGameState>(
+		if (const AOnlineGameState* OnlineGunplayGameState = Cast<AOnlineGameState>(
 			UGameplayStatics::GetGameState(this)))
 		{
 			TArray<APlayerState*> PlayerStates = OnlineGunplayGameState->GetPlayerStates();
@@ -60,8 +60,8 @@ void UMatchInfoWidget::UpdateRankItems()
 			{
 				if (PlayerStates.IsValidIndex(PlayerStateIndex))
 				{
-					if (URankListItemWidget* RankListItemWidget = CreateWidget<
-						URankListItemWidget>(this, RankListItemClass))
+					if (UPlayerInfoListItemWidget* RankListItemWidget = CreateWidget<
+						UPlayerInfoListItemWidget>(this, PreviewPlayerInfoListItemClass))
 					{
 						RankListItemWidget->Inject(Cast<AOnlinePlayerState>(PlayerStates[PlayerStateIndex]));
 						RankPreview->AddChild(RankListItemWidget);

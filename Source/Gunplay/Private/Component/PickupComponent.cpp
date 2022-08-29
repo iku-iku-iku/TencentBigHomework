@@ -71,7 +71,6 @@ void UPickupComponent::OnRep_bSimulatePhysics() const
 
 void UPickupComponent::DetachFromPlayer()
 {
-	SetSimulatePhysics(true);
 	OwnerPlayer->GetHoldingComponent()->RemoveHolding(GetOwner());
 	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }

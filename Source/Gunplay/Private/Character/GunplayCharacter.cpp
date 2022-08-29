@@ -91,7 +91,12 @@ void AGunplayCharacter::BeHit(const FHitInfo& HitInfo)
 			BeKilledBy(HitInfo.Hitter);
 		}
 
-		DeathEvent.Broadcast(this);
+		if (! bDead)
+		{
+			bDead = true;
+
+			DeathEvent.Broadcast(this);
+		}
 	}
 
 	FVector Dir;

@@ -11,8 +11,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
-#include "Game/Online/OnlineGunplayGameState.h"
-#include "UI/Game/RankListWidget.h"
+#include "Game/Online/OnlineGameState.h"
+#include "UI/Game/PlayerInfoListWidget.h"
 #include "Util/GunplayUtils.h"
 
 void AOnlinePlayerController::Client_EndGame_Implementation()
@@ -22,12 +22,7 @@ void AOnlinePlayerController::Client_EndGame_Implementation()
 	{
 		EndUI->AddToViewport();
 	}
-	ShowRankList();
-}
-
-void AOnlinePlayerController::Client_SetCountDownTimer_Implementation(const int32 NewValue)
-{
-	CountDownTimer = NewValue;
+	ShowPlayerInfoList();
 }
 
 void AOnlinePlayerController::BeginPlay()
@@ -38,8 +33,8 @@ void AOnlinePlayerController::BeginPlay()
 
 	if (IsLocalPlayerController())
 	{
-		RankListWidget = CreateWidget<URankListWidget>(this, RankListWidgetClass);
-		if (RankListWidget) { RankListWidget->AddToViewport(); }
+		PlayerInfoListWidget = CreateWidget<UPlayerInfoListWidget>(this, PlayerInfoListWidgetClass);
+		if (PlayerInfoListWidget) { PlayerInfoListWidget->AddToViewport(); }
 	}
 }
 
@@ -59,30 +54,14 @@ void AOnlinePlayerController::SetPawn(APawn* InPawn)
 			if (AOnlinePlayerState* OnlinePlayerState = GetState())
 			{
 				const FUniqueNetIdRepl UniqueNetId = GetPlayerState<APlayerState>()->GetUniqueId();
-				FVector Color = GunplayGameInstance->GetPlayerCharacterColor(UniqueNetId);
-				// Color += GunplayUtils::FRandVector() * 1e-4;
+				const FVector Color = GunplayGameInstance->GetPlayerCharacterColor(UniqueNetId);
+				
 				OnlinePlayerState->SetColor(Color);
 
 				OnlinePlayerState->OnRep_CharacterColor();
 			}
 		}
 	}
-}
-
-void AOnlinePlayerController::OnPlayerDeath(const APlayerCharacter* GunplayCharacter)
-{
-	Super::OnPlayerDeath(GunplayCharacter);
-
-	if (APlayerCharacter* PlayerCharacter = const_cast<APlayerCharacter*>(GunplayCharacter))
-	{
-		PlayerCharacter->Die();
-	}
-
-	PlayerState->SetIsSpectator(true);
-	ChangeState(NAME_Spectating);
-
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AOnlinePlayerController::RespawnPlayer,
-	                                RespawnDelayTime, false);
 }
 
 void AOnlinePlayerController::RespawnPlayer()
@@ -100,24 +79,26 @@ void AOnlinePlayerController::RespawnPlayer()
 
 				PlayerState->SetIsSpectator(false);
 				ChangeState(NAME_Playing);
+
+				bDead = false;
 			}
 		}
 	}
 }
 
-void AOnlinePlayerController::ShowRankList()
+void AOnlinePlayerController::ShowPlayerInfoList()
 {
-	if (RankListWidget)
+	if (PlayerInfoListWidget)
 	{
-		RankListWidget->SetVisibility(ESlateVisibility::Visible);
-		RankListWidget->UpdateRankItems();
+		PlayerInfoListWidget->SetVisibility(ESlateVisibility::Visible);
+		PlayerInfoListWidget->UpdateRankItems();
 	}
 }
 
-void AOnlinePlayerController::HideRankList()
+void AOnlinePlayerController::HidePlayerInfoList()
 {
-	if (!bIsGameEnd && RankListWidget)
+	if (!bIsGameEnd && PlayerInfoListWidget)
 	{
-		RankListWidget->SetVisibility(ESlateVisibility::Hidden);
+		PlayerInfoListWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

@@ -39,13 +39,20 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_StartGame(const FString& MapName);
-	
+
 public:
 	FORCEINLINE FPlayerInfo GetPlayerInfo() { return PlayerInfo; }
 
 	FORCEINLINE bool IsHost() const { return bIsHost; }
 
 	FORCEINLINE void SetIsHost(const bool NewValue) { bIsHost = NewValue; }
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetMapItemIndex(const int32 NewValue);
+
+	void SetMapItemIndex(const int32 NewValue);
+
+	FORCEINLINE int32 GetMapItemIndex() const { return MapItemIndex; }
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -64,9 +71,16 @@ protected:
 	UPROPERTY(Replicated)
 	bool bIsHost;
 
+	UPROPERTY(ReplicatedUsing=OnRep_MapItemIndex)
+	int32 MapItemIndex = 0;
+
+	UFUNCTION()
+	void OnRep_MapItemIndex();
 private:
 	UFUNCTION(Server, Reliable)
 	void Server_DestroySessions();
 
 	bool CanStartGame() const;
+
+
 };
